@@ -46,18 +46,22 @@
         <input type="submit" value="Submit" />
       </div>
     </div>
-    <div class="action">
-      <button class="btn-record" @click="startRecord()">Start record</button>
-      <button
-        class="btn-replay"
-        :disabled="events.length < 2"
-        @click="playRecord()"
-      >
-        Replay Record
-      </button>
-    </div>
-    <div class="reset">
-      <button @click="resetRecord()">Reset</button>
+    <div class="rr-block action">
+      <div class="record">
+        <button class="btn-record" @click="startRecord()">Start record</button>
+        <button
+          class="btn-replay"
+          :disabled="events.length < 2"
+          @click="playRecord()"
+        >
+          Replay Record
+        </button>
+      </div>
+      <div class="reset">
+        <button @click="resetRecord()">Reset</button>
+        <!-- <button @click="saveRecord()">Save</button> -->
+        <!-- <button @click="replaySavedRecord()">Replay Saved Record</button> -->
+      </div>
     </div>
 
     <div id="rrweb" class="replay"></div>
@@ -102,6 +106,24 @@ export default {
       const replayEl = document.getElementsByClassName('rr-player')[0]
       if (replayEl) replayEl.remove()
     },
+    saveRecord() {
+      const data = JSON.stringify(this.events)
+      window.localStorage.setItem('rrweb', data)
+    },
+    replaySavedRecord() {
+      const replayEl = document.getElementsByClassName('rr-player')[0]
+      if (replayEl) replayEl.remove()
+      const rrwebEl = document.getElementById('rrweb')
+      const savedEvents = window.localStorage.getItem('rrweb')
+      // eslint-disable-next-line no-new
+      new RrwebReplay({
+        target: rrwebEl,
+        data: {
+          events: JSON.parse(savedEvents),
+          autoPlay: true,
+        },
+      })
+    },
   },
 }
 </script>
@@ -116,9 +138,10 @@ export default {
 }
 .action {
   padding-top: 20px;
-  padding-bottom: 20px;
 }
-
+.reset {
+  padding-top: 20px;
+}
 .container {
   max-width: 1000px;
 }
